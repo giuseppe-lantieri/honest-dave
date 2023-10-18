@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href={{asset("css/main.css") }}>
-    <script src={{ asset("js/index.js") }} defer></script>
-    <title>Laravel</title>
+    <title>Home</title>
 </head>
 
 <body>

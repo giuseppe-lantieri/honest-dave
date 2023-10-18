@@ -13,7 +13,7 @@
         const CSRF_TOKEN = "{{ csrf_token() }}"
     </script>
     <script src={{ asset("js/index.js") }} defer></script>
-    <title>Laravel</title>
+    <title>Collections</title>
 </head>
 
 <body>
