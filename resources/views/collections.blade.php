@@ -10,7 +10,6 @@
     <script>
         const COLLECTION_ID = {{ $collection->id }}
         const USER_ID = {{ Auth::user()->id }}
-        const CSRF_TOKEN = "{{ csrf_token() }}"
     </script>
     <script src={{ asset("js/index.js") }} defer></script>
     <title>Collections</title>

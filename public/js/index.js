@@ -11,7 +11,6 @@ function reduceName(stringa) {
 
 
 DIV_ELEMENTS.addEventListener("click", async (event) => {
-    console.log("ciao");
     if (state_elements)
         event.currentTarget.classList.add("hidden-child");
     else
@@ -21,6 +20,11 @@ DIV_ELEMENTS.addEventListener("click", async (event) => {
 
 SEARCH_BAR.addEventListener("submit", async (event) => {
     event.preventDefault();
+
+    DIV_RESULT.innerHTML = `
+    <div class="loader"></div> 
+    `;
+
     const data = new FormData(event.currentTarget);
     const value_to_search = data.get("search");
     const response = await fetch(`https://itunes.apple.com/search?media=movie&term=${value_to_search}`);
@@ -55,11 +59,6 @@ SEARCH_BAR.addEventListener("submit", async (event) => {
             ${await checkIfPresent(ele)}
         </form>`
     )
-
-
-    DIV_RESULT.innerHTML = `
-    <div class="loader"></div> 
-    `
 
     const a_string_for_table = array_results_from_itunes.map(async (ele, index) => {
         switch (index % N_COL) {
