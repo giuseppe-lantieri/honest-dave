@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('image');
-            $table->foreignId('collection_id');
-            $table->foreignId('user_id');
+            $table->string('imdbID')->unique();
+            $table->foreignId('collection_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

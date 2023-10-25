@@ -1,22 +1,11 @@
 const SEARCH_BAR = document.getElementById("search-bar");
-const DIV_ELEMENTS = document.getElementById("elements");
 const DIV_RESULT = document.getElementById("risultati");
-let state_elements = true;
 
-const N_COL = 5;
+const N_COL = 3;
 
 function reduceName(stringa) {
-    return stringa.length > 10 ? stringa.substring(0, 10) + "..." : stringa
+    return stringa.length > 15 ? stringa.substring(0, 15) + "..." : stringa
 }
-
-
-DIV_ELEMENTS.addEventListener("click", async (event) => {
-    if (state_elements)
-        event.currentTarget.classList.add("hidden-child");
-    else
-        event.currentTarget.classList.remove("hidden-child");
-    state_elements = !state_elements;
-})
 
 SEARCH_BAR.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -27,37 +16,40 @@ SEARCH_BAR.addEventListener("submit", async (event) => {
 
     const data = new FormData(event.currentTarget);
     const value_to_search = data.get("search");
-    const response = await fetch(`https://itunes.apple.com/search?media=movie&term=${value_to_search}`);
+    const response = await fetch(`http://www.omdbapi.com/?` + new URLSearchParams({
+        s: value_to_search,
+        apikey: KEY_OMDB
+    }));
     const value_json = await response.json();
 
-    const array_results_from_itunes = value_json.results;
+    const array_results_from_itunes = value_json.Search;
 
     const checkIfPresent = async (ele) => {
         const url = "/api/check/items?" + new URLSearchParams({
-            name: ele.trackName,
-            image: ele.artworkUrl100,
+            imdbID: ele.imdbID,
             collection_id: COLLECTION_ID,
             user_id: USER_ID,
         });
-        const result = await (await fetch(url)).json()
-
+        const text = await fetch(url);
+        const result = await text.text();
         if (result) {
-            return `<p>Inserito</p>`
+            return `<p class="all-width borded">✔️ Inserito</p>`
         } else {
-            return `<input type="submit" value="+" />`
+            return `<input class="all-width" type="submit" value="+" />`
         }
     }
 
     const createComponent = async (ele) => (`
-        <form onsubmit="return submit_controlled(event)">
-            <img src="${ele.artworkUrl100}" />
-            <h3>${reduceName(ele.trackName)}</h3>
-            <input type="hidden" id="name" name="name" value="${ele.trackName}" /> 
-            <input type="hidden" id="image" name="image" value="${ele.artworkUrl100}" /> 
-            <input type="hidden" id="collection_id" name="collection_id" value="${COLLECTION_ID}" /> 
-            <input type="hidden" id="user_id" name="user_id" value="${USER_ID}" /> 
-            ${await checkIfPresent(ele)}
-        </form>`
+            <form class="card" onsubmit="return submit_controlled(event)">
+                <img src="${ele.Poster}" />
+                <h3>${reduceName(ele.Title)}</h3>
+                <input type="hidden" id="name" name="name" value="${ele.Title}" /> 
+                <input type="hidden" id="image" name="image" value="${ele.Poster}" /> 
+                <input type="hidden" id="imdbID" name="imdbID" value="${ele.imdbID}" /> 
+                <input type="hidden" id="collection_id" name="collection_id" value="${COLLECTION_ID}" /> 
+                <input type="hidden" id="user_id" name="user_id" value="${USER_ID}" /> 
+                ${await checkIfPresent(ele)}
+            </form>`
     )
 
     const a_string_for_table = array_results_from_itunes.map(async (ele, index) => {
@@ -99,14 +91,15 @@ function submit_controlled(event) {
         method: "POST",
         body: data
     }).then(() => {
-        target.removeChild(target.children[6]);
+        target.removeChild(target.children[7]);
         const success = document.createElement("p");
-        success.textContent = "Successo";
+        success.textContent = "✔️ Successo";
         target.appendChild(success);
     }).catch((e) => {
-        target.removeChild(target.children[6]);
+        target.removeChild(target.children[7]);
         const error = document.createElement("p");
-        error.textContent = "Errore";
+        error.textContent = "❌ Errore";
+        error.classList.add("error-text")
         target.appendChild(error);
     })
     return false;

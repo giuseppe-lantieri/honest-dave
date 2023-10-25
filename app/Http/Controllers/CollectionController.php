@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
-use App\Models\Item;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,13 +12,18 @@ class CollectionController extends Controller
 {
     //
 
-
     public function index()
     {
         if (Auth::user()) {
-            $cs = Collection::all()->where("user_id", Auth::user()->getAuthIdentifier());
+            $collections = Collection::all();
+            $my_collections = Auth::user()->collections;
+            $favorites = Auth::user()->favorites;
+
+            // dd($favorites);
             return view('home', [
-                'cs' => $cs
+                'collections' => $collections,
+                "my_collections" => $my_collections,
+                "favorites"=> $favorites
             ]);
         }
 
@@ -27,10 +32,20 @@ class CollectionController extends Controller
 
     public function show(Collection $collection)
     {
-        $items = Item::where(['collection_id'=> $collection->id,'user_id'=> Auth::user()->id])->get();
-        return view("collections",[
-            'collection'=>$collection,
-            'items'=> $items
+        $items = $collection->items;
+        return view("collections", [
+            'collection' => $collection,
+            'items' => $items
+        ]);
+    }
+
+
+    public function other(Collection $collection)
+    {
+        $items = $collection->items;
+        return view("other-collections", [
+            'collection' => $collection,
+            'items' => $items
         ]);
     }
 
@@ -42,5 +57,24 @@ class CollectionController extends Controller
         ]);
 
         return redirect()->route("home");
+    }
+
+
+    public function destroy(Collection $collection)
+    {
+        $collection->delete();
+        return redirect()->route('home');
+    }
+
+    public function favorite(Collection $collection)
+    {
+        $collection->favorites()->attach(Auth::user()->id);
+        return redirect()->route('home');
+    }
+
+    public function unfavorite(Collection $collection)
+    {
+        $collection->favorites()->detach(Auth::user()->id);
+        return redirect()->route('home');
     }
 }

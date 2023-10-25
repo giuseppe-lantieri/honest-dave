@@ -22,17 +22,60 @@
         </div>
         @endguest
         @auth
+        <div class="all-width">
+            <x-hider title="Le mie Raccolte">
+                <div class="mt all-width start">
+                    <form action={{ route("collections.store") }} method="post">
+                        @csrf
+                        <input type="text" name="name" id="name">
+                        <input type="submit" value="Crea Raccolta">
+                    </form>
+                </div>
+                <table>
+                    @foreach ($my_collections as $collection )
+                    <x-table-maker :index="$loop->index" :cols="3">
+                        <x-card :route="route('collections.show',[$collection])" :src="asset('img/directory.png')"
+                            alt="directory" :name="$collection->name"
+                            delete="{{ route('collections.destroy',[$collection]) }}" favorite="null" sfavorite="null"
+                            stats="Favorite: {{ $collection->favorites()->count() }}" />
+                    </x-table-maker>
+                    @endforeach
+                </table>
+            </x-hider>
 
-        <form action={{ route("collections.store") }} method="post">
-            @csrf
-            <input type="text" name="name" id="name">
-            <input type="submit" value="Crea Raccolta">
-        </form>
+            <x-hider title="Le tue raccolte preferite">
+                <table>
+                    @forelse ($favorites as $collection )
+                    <x-table-maker :index="$loop->index" :cols="3">
+                        <x-card :route="route('collections.other',[$collection])" :src="asset('img/directory.png')"
+                            alt="directory" :name="$collection->name" delete="null"
+                            favorite="{{ route('collections.favorite',[$collection]) }}"
+                            sfavorite="{{ route('collections.unfavorite',[$collection]) }}"
+                            stats="Favorite: {{ $collection->favorites()->count() }}" />
+                    </x-table-maker>
+                    @empty
+                    <span>No Item to show</span>
+                    @endforelse
+                </table>
+            </x-hider>
 
-        @foreach ( $cs as $collection )
-        <a href={{ route("collections.show",[$collection]) }}>{{ $collection->name }}</a>
+            <x-hider title="Raccolte da tutti gli utenti">
+                <table>
+                    @forelse ($collections as $collection )
+                    <x-table-maker :index="$loop->index" :cols="3">
+                        <x-card :route="route('collections.other',[$collection])" :src="asset('img/directory.png')"
+                            alt="directory" :name="$collection->name" delete="null"
+                            favorite="{{ route('collections.favorite',[$collection]) }}"
+                            sfavorite="{{ route('collections.unfavorite',[$collection]) }}"
+                            stats="Favorite: {{ $collection->favorites()->count() }}" />
+                    </x-table-maker>
+                    @empty
+                    <span>No Item to show</span>
+                    @endforelse
+                </table>
+            </x-hider>
+        </div>
 
-        @endforeach
         @endauth
 
     </x-main>

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Collection extends Model
 {
@@ -16,8 +14,18 @@ class Collection extends Model
         "user_id"
     ];
 
-    public function items(): HasMany
+    public function items()
     {
-        return $this->HasMany(Item::class);
+        return $this->hasMany(Item::class)->orderBy("id", "desc");
+    }
+
+    public function favorites()
+    {
+        return $this->belongsToMany(User::class, "favorites")->withTimestamps();
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }

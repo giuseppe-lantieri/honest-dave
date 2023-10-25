@@ -13,12 +13,17 @@ class Item extends Model
     protected $fillable = [
         'name',
         'image',
+        'imdbID',
         'collection_id',
         'user_id',
     ];
 
-    public function likes(): HasMany
+    public function likes()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, "likes")->withTimestamps();
+    }
+
+    public function collections(){
+        return $this->belongsToMany(Collection::class)->withTimestamps();
     }
 }
